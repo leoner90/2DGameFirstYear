@@ -7,10 +7,13 @@
 #include "headers/Player.h"
 
 //Global for class
-MapGen  mapGen;
-playerStats playerstats;
-PlayerInterface playerInterface;
-Player player;
+CMyGame::CMyGame()
+{
+	player = new Player();
+	mapGen = new MapGen();
+	playerstats = new playerStats();
+	playerInterface = new PlayerInterface();
+}
 
 /******************************** INIT ********************************/
 void CMyGame::OnInitialize()
@@ -31,10 +34,10 @@ void CMyGame::OnInitialize()
 	menuMusic.Volume(0.5);
 	
 	//main init of all classes
-	player.init(GetWidth());
-	playerstats.init(GetHeight(), GetWidth());
-	playerInterface.init(GetWidth(), GetHeight());
-	mapGen.init(GetHeight(), GetWidth());
+	player->init(GetWidth());
+	playerstats->init(GetHeight(), GetWidth());
+	playerInterface->init(GetWidth(), GetHeight());
+	mapGen->init(GetHeight(), GetWidth());
 
 	//Enemies lvl 1 init
 	GameLevel1Spawn();
@@ -53,12 +56,12 @@ void CMyGame::OnUpdate()
 	}
 	else 
 	{
-		//***** Player and Map Update
-		player.OnUpdate(GetTime(), AllEnemies, IsKeyDown(SDLK_d), IsKeyDown(SDLK_a), mapGen, isPlayerDead);
-		mapGen.OnUpdate(GetTime(), player.player, GetHeight());
-		
+		//***** Player / Map  PlayerInterface Update
+		player->OnUpdate(GetTime(), AllEnemies, IsKeyDown(SDLK_d), IsKeyDown(SDLK_a), *mapGen, isPlayerDead);
+		mapGen->OnUpdate(GetTime(), *player->playerSprite, GetHeight());
+		playerInterface->OnUpdate(*player, GetWidth(), GetHeight());
 		//***** BossMusic
-		if (player.player.GetX() > 23000 && !finalMusic) 
+		if (player->playerSprite->GetX() > 23000 && !finalMusic)
 		{
 			BgMusic.Play("FinalBoss.wav");
 			finalMusic = true;
@@ -74,7 +77,7 @@ void CMyGame::OnUpdate()
 				AllEnemies.erase(AllEnemies.begin() + i); //if regular enemie dead -> delete;
 				delete enemy;
 			}
-			else enemy->OnUpdate(GetTime(), player, true, mapGen);	
+			else enemy->OnUpdate(GetTime(), *player, *mapGen);	
 		}
 
 		if (isPlayerDead) GameOver();
@@ -122,32 +125,33 @@ void CMyGame::OnDraw(CGraphics* g)
 	{
 		if (currentMenuState == MENU)  menuHandler(g);
 		if (currentMenuState == CHARSTATS)
-			playerstats.OnDraw(g, GetHeight(), player.str, player.dex, player.con, player.intellect, player.Skillpoint, player);
+			playerstats->OnDraw(g, GetHeight(),  *player);
 	}
 	//***** IF IN GAME!
 	else 
 	{
-		mapGen.OnDraw(g);
-		player.OnDraw(g);
+		mapGen->OnDraw(g);
+		player->OnDraw(g);
 		for (auto enemy : AllEnemies) enemy->OnDraw(g);
 		
 		//reset world Scroll to zero
 		g->SetScrollPos(0, 0);
 
 		//Location Name Printing
-		if (LocationNumber == 0 && player.player.GetX() > 300)	PrintLocationName(g, "Wood Near Red Wolf Clan", 1);
-		if (LocationNumber == 1 && player.player.GetX() > 17000) 	PrintLocationName(g, "Red Wolf Clan Vilage", 2);
-		if (LocationNumber == 2 && player.player.GetX() > 23000) 	PrintLocationName(g, "Leader Lair", 3);
-		if (player.player.GetX() < 17000 && LocationNumber != 1 && LocationNumber != 0)  LocationNumber = 0;
+		if (LocationNumber == 0 && player->playerSprite->GetX() > 300)	PrintLocationName(g, "Forest Near Red Wolf Clan", 1);
+		if (LocationNumber == 1 && player->playerSprite->GetX() > 17000) 	PrintLocationName(g, "Red Wolf Clan Vilage", 2);
+		if (LocationNumber == 2 && player->playerSprite->GetX() > 23000) 	PrintLocationName(g, "Leader Lair", 3);
+		if (player->playerSprite->GetX() < 17000 && LocationNumber != 1 && LocationNumber != 0)  LocationNumber = 0;
 
 		//Enemies Spawn by Lvl(should be done in init probably)
-		if (player.player.GetX() > 7000 && !spawnLevel2)  GameLevel2Spawn();
-		if (player.player.GetX() > 14000 && !spawnLevel3) GameLevel3Spawn();
+		if (player->playerSprite->GetX() > 7000 && !spawnLevel2)  GameLevel2Spawn();
+		if (player->playerSprite->GetX() > 14000 && !spawnLevel3) GameLevel3Spawn();
 	
-		playerInterface.OnDraw(player, g, mapGen.scrollOffset, GetWidth(), GetHeight());
-		*g << font(22) << color(CColor::LightBlue()) << xy(0,0) << GetTime();
+		playerInterface->OnDraw(*player, g, GetWidth(), GetHeight());
 	}
 }
+
+
 
 
 //************************************* INIT SPRITES *************************************
@@ -227,7 +231,7 @@ void CMyGame::enemyCreator(int enemyList[][7])
 		AllEnemies.push_back(enemy);
 	}
 
-	//delete localAllEnemies to save memory
+	//delete localAllEnemies & enemylist to save memory
 }
 
 
@@ -313,8 +317,8 @@ void CMyGame::PrintLocationName(CGraphics* g, char* locationName, int newMapleve
 void CMyGame::OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode)
 {
 	//*********Player BTN controler*********
-	if (gameStarted) player.OnKeyDown(sym, mod, unicode, IsMenuMode(), playerInterface);
-	player.footSteps.Stop();
+	if (gameStarted) player->OnKeyDown(sym, mod, unicode, IsMenuMode(), *playerInterface);
+	player->footSteps.Stop();
 	
 	//********** CUTSCENES HANDLER **********
 	if (currentMenuState == STARTCUTSCENE && sym == SDLK_SPACE)
@@ -426,10 +430,10 @@ void CMyGame::OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode)
 		}
 		else 
 		{
-			player.setDefaultStandAnimation();
+			player->setDefaultStandAnimation();
 			ShowMouse();
 			ChangeMode(MODE_MENU);
-			playerstats.charStatsScreen->SetY(GetHeight() * 2);
+			playerstats->charStatsScreen->SetY(GetHeight() * 2);
 			currentMenuState = CHARSTATS;
 		}
 	}
@@ -438,7 +442,7 @@ void CMyGame::OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode)
 
 void CMyGame::OnLButtonUp(Uint16 x,Uint16 y) 
 {
-	playerstats.OnLButtonUp(player, player.Skillpoint, GetMouseCoords());
+	playerstats->OnLButtonUp(*player, player->Skillpoint, GetMouseCoords());
 }
 
 void CMyGame::menuHandler(CGraphics* g)

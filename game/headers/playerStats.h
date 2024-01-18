@@ -9,7 +9,7 @@ public:
 
 	void init(float screenHeight, float screenWidth);
 	void OnUpdate();
-	void OnDraw(CGraphics* g, float screenHeight, int& str, int& dex, int& con, int& intellect, int& Skillpoint, Player& player);
+	void OnDraw(CGraphics* g, float screenHeight, Player& player);
 	void StatsPosition(CGraphics* g, int& stat, float textY, float btnY, int& Skillpoint, char* statName);
 
 	void OnKeyDown(SDLKey sym, SDLMod mod, Uint16 unicode);

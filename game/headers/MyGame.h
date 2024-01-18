@@ -1,8 +1,14 @@
 #pragma once
 class Enemy;
- 
+class Player;
+class MapGen;
+class playerStats;
+class PlayerInterface;
+
 class CMyGame : public CGame
 {
+public:
+	CMyGame();
 private:
 	 
 	//Enemies
@@ -19,6 +25,17 @@ private:
 	float deathScreenTimer; // saves current time + resetTimer
 	float resetTimer; // actual waiting time
 
+	//Player Class
+	Player* player;
+
+	//Map Class
+	MapGen* mapGen;
+
+	//playerStats Class
+	playerStats* playerstats;
+
+	//PlayerInterface Class
+	PlayerInterface* playerInterface;
 
 	//Sprites todo NEW pointers
 	void initSpritesHandler();

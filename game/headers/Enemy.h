@@ -6,16 +6,20 @@ class MapGen;
 class Enemy  
 {
 public:
+	//constructor & destructor
+	Enemy();
+	~Enemy();
+
 	//Main Functions
 	void init(int xPos, int yPos, int typeofEnemy, int con, int str, int dex, int intellect);
-	void OnUpdate(Uint32 t, Player& player, bool patrol, MapGen& mapGen);
+	void OnUpdate(Uint32 t, Player& player, MapGen& mapGen);
 	void OnDraw(CGraphics* g);
 	
 	//Damage
 	void EnemyGettingDamage(float damageAmount, float t, CSpriteList& DroppedPoutions);
 
 	//mainSprite
-	CSprite enemy;
+	CSprite* enemySprite;
 
 	//Is enemy dead , And coundown till insstance is deleted to play animation
 	bool dead;
@@ -44,7 +48,7 @@ private:
 	//Enemie Conditions
 	enum AllEnemies { WARIOR, NINJAGIRL, NINJAGIRLKUNAI, DOG, NINJAGIRLMELEE, BOSS1 };
 				
-	enum action_state { CHASSING, PATROL };
+	enum action_state { CHASSING, PATROL, INATTACKCONDITION };
 	enum animation_state { NONE, STANDLEFT, STANDRIGHT, WALKLEFT, WALKRIGHT, InAir, FALLING, SLIDE, INATTACK, ONHIT, DEAD };
 	bool inAttack, inDamage;
 
@@ -78,7 +82,7 @@ private:
 	void enemyDeathHandler();
 
 	//Controller
-	void EnemyController(bool patrol);
+	void EnemyController();
 
 	//Collisions
 	void EnemyCollision(MapGen& mapGen);

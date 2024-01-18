@@ -24,7 +24,7 @@ void playerStats::OnUpdate()
 
 }
 
-void playerStats::OnDraw(CGraphics* g, float screenHeight, int& str, int& dex, int& con, int& intellect, int& Skillpoint, Player &player)
+void playerStats::OnDraw(CGraphics* g, float screenHeight, Player &player)
 {
 	charStatsScreen->Draw(g);
 

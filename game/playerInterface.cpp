@@ -6,7 +6,7 @@ CSpriteRect hpBarRect(0, 500, 100, 100, CColor::Red(), CColor::Red(), 1);
 CSpriteRect EnergyBarRect(0, 500, 100, 100, CColor::DarkYellow(), CColor::DarkYellow(), 1);
 CSpriteRect ManaBarRect(0, 500, 100, 100, CColor::Blue(), CColor::Blue(), 1);
 
-void PlayerInterface::playerEnergyBarUpdate(CSprite& ddEnergyBarRect, float& CurrentEnergy, float maxEnergy, float InitRectSize, float CustomeOffset, float RegenRate, float initWidth, float scrollOffset)
+void PlayerInterface::playerEnergyBarUpdate(CSprite& ddEnergyBarRect, float& CurrentEnergy, float maxEnergy, float InitRectSize, float CustomeOffset, float RegenRate, float initWidth)
 {
 	float StaminaInPercent = CurrentEnergy / maxEnergy; // 1%
 	float rectSize = InitRectSize * StaminaInPercent;
@@ -65,20 +65,19 @@ void PlayerInterface::init(int screenWidth, int screenHeight)
 	ManaBarRect.SetSize(165, 28);
 }
 
-void PlayerInterface::OnUpdate(Player& player, float scrollOffset, int screenWidth, int screenHeight)
+void PlayerInterface::OnUpdate(Player& player, int screenWidth, int screenHeight)
 {
 	energyBar->SetPosition(270, screenHeight - 50);
 	controllPanel->SetPosition( screenWidth / 2, 40);
 
 	//ENERGY
-	playerEnergyBarUpdate(hpBarRect, player.CurrentPlayerHealth, player.maxPlayerHealth, 410, 302.5, 0.f, 45, scrollOffset);
-	playerEnergyBarUpdate(EnergyBarRect, player.CurrentPlayerEnergy, player.maxPlayerEnergy, 165, 210, 0.01f * player.dex, 25, scrollOffset);
-	playerEnergyBarUpdate(ManaBarRect, player.CurrentPlayerMp, player.maxPlayerMp, 165, 170, 0.f, 25, scrollOffset);
+	playerEnergyBarUpdate(hpBarRect, player.CurrentPlayerHealth, player.maxPlayerHealth, 410, 302.5, 0.f, 45);
+	playerEnergyBarUpdate(EnergyBarRect, player.CurrentPlayerEnergy, player.maxPlayerEnergy, 165, 210, 0.01f * player.dex, 25);
+	playerEnergyBarUpdate(ManaBarRect, player.CurrentPlayerMp, player.maxPlayerMp, 165, 170, 0.f, 25);
 }
 
-void PlayerInterface::OnDraw(Player& player, CGraphics* g, float scrollOffset, int screenWidth, int screenHeight)
+void PlayerInterface::OnDraw(Player& player, CGraphics* g, int screenWidth, int screenHeight)
 {
-	OnUpdate( player, scrollOffset,screenWidth,  screenHeight);
 	hpBarRect.Draw(g);
 	EnergyBarRect.Draw(g);
 	ManaBarRect.Draw(g);

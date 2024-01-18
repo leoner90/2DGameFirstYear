@@ -31,7 +31,7 @@ public:
 	void setDefaultStandAnimation();
 	float PlayerDirection;
 	float slideInitPos;
-	CSprite player;
+	CSprite* playerSprite;
  
 	//level
 	float levelsRange[9] = { 500,1500,3000,5000,8000,12000,17000,23000,30000};
